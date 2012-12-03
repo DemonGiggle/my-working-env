@@ -5,7 +5,7 @@ set shiftwidth=4
 set tabstop=4
 set expandtab ts=4 sw=4 ai
 set hlsearch
-nmap ,f :FufFileWithCurrentBufferDir<CR>
+nmap ,f :FufCoverageFile<CR>
 nmap ,b :FufBuffer<CR>
 nmap ,t :FufTaggedFile<CR>
 map sa :exec "/\\(".getreg('/')."\\)\\\\|".expand("<cword>")<CR>
