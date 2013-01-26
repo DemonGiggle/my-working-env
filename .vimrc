@@ -17,11 +17,31 @@ map J ::BufSurfBack<CR>
 
 cabbrev grep <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Grep' : 'grep')<CR>
 cabbrev find <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Find' : 'find')<CR>
+cabbrev git <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Git' : 'git')<CR>
+cabbrev gitstatus <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitStatus' : 'gitstatus')<CR>
+cabbrev gitadd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitAdd' : 'gitadd')<CR>
+cabbrev gitcommit <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCommit' : 'gitcommit')<CR>
+cabbrev gitlog <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitLog' : 'gitlog')<CR>
+cabbrev gitcheckout <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCheckout' : 'gitcheckout')<CR>
+cabbrev gitdiff <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitDiff' : 'gitdiff')<CR>
+cabbrev gitpull <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPull' : 'gitpull')<CR>
+cabbrev gitpush <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPush' : 'gitpush')<CR>
+cabbrev gitblame <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitBlame' : 'gitblame')<CR>
+
 map ,s :execute " grep -srnw --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --binary-files=without-match --exclude-dir=.git --exclude-dir=.repo . -e " . expand("<cword>") . " " <bar> cwindow<CR>
 
 "Set ctags looking path
 set tags=tags;/
 set tags+=~/ctags/boost.tags
+
+set laststatus=2
+set statusline=%{GitBranch()}\ [%t:%l:%c\ --\ %p%%]\ %m%r
+
+"Something about undo
+set undodir=~/.vim/undodir
+set undofile
+set undolevels=1000 "maximum number of changes tha can be undone
+set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 
 " --- OmniCppComplete ---
 " -- required --
@@ -92,14 +112,3 @@ function! Find(name)
 endfunction
 command! -nargs=1 Find :call Find("<args>")
 
-" Search for selected text, forwards or backwards.
-vnoremap <silent> * :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy/<C-R><C-R>=substitute(
-  \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
-vnoremap <silent> # :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy?<C-R><C-R>=substitute(
-  \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
