@@ -64,6 +64,11 @@ set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 "set tags+=~yoco/tags/boost/boost_tags
 " Find file in current directory and edit it.
 
+" vim-gitgutter hotkeys
+nmap <silent> ]h :<C-U>execute v:count1 . "GitGutterNextHunk"<CR>
+nmap <silent> [h :<C-U>execute v:count1 . "GitGutterPrevHunk"<CR>
+highlight clear SignColumn
+
 nmap ,a :call SwitchSourceHeader()<CR>
 
 function! SwitchSourceHeader()
