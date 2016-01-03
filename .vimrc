@@ -5,34 +5,40 @@ set shiftwidth=4
 set tabstop=4
 set expandtab ts=4 sw=4 ai
 set hlsearch
+set backspace=indent,eol,start
+syntax on
 nmap ,f :FufCoverageFile<CR>
 nmap ,b :FufBuffer<CR>
-nmap ,t :FufTaggedFile<CR>
+nmap ,,f :FufFileWithCurrentBufferDir<CR>
+nmap ,l :FufLine<CR>
+"nmap ,t :FufTaggedFile<CR>
+nmap ,d :GoDef<CR>
+nmap ,e :GoDoc<CR>
 map sa :exec "/\\(".getreg('/')."\\)\\\\|".expand("<cword>")<CR>
 map ,c :Tlist<CR>
+nmap ,t :TagbarToggle<CR>
 
 "Buffer surf back and force
-map K :BufSurfForward<CR>
-map J ::BufSurfBack<CR>
+"map K :BufSurfForward<CR>
+"map J ::BufSurfBack<CR>
 
 cabbrev grep <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Grep' : 'grep')<CR>
 cabbrev find <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Find' : 'find')<CR>
-cabbrev git <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Git' : 'git')<CR>
-cabbrev gitstatus <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitStatus' : 'gitstatus')<CR>
-cabbrev gitadd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitAdd' : 'gitadd')<CR>
-cabbrev gitcommit <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCommit' : 'gitcommit')<CR>
-cabbrev gitlog <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitLog' : 'gitlog')<CR>
-cabbrev gitcheckout <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCheckout' : 'gitcheckout')<CR>
-cabbrev gitdiff <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitDiff' : 'gitdiff')<CR>
-cabbrev gitpull <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPull' : 'gitpull')<CR>
-cabbrev gitpush <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPush' : 'gitpush')<CR>
-cabbrev gitblame <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitBlame' : 'gitblame')<CR>
+"cabbrev git <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Git' : 'git')<CR>
+"cabbrev gitstatus <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitStatus' : 'gitstatus')<CR>
+"cabbrev gitadd <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitAdd' : 'gitadd')<CR>
+"cabbrev gitcommit <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCommit' : 'gitcommit')<CR>
+"cabbrev gitlog <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitLog' : 'gitlog')<CR>
+"cabbrev gitcheckout <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitCheckout' : 'gitcheckout')<CR>
+"cabbrev gitdiff <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitDiff' : 'gitdiff')<CR>
+"cabbrev gitpull <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPull' : 'gitpull')<CR>
+"cabbrev gitpush <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPush' : 'gitpush')<CR>
+"cabbrev gitblame <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitBlame' : 'gitblame')<CR>
 
-map ,s :execute " grep -srnw --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --binary-files=without-match --exclude-dir=.git --exclude-dir=.repo . -e " . expand("<cword>") . " " <bar> cwindow<CR>
-
+map ,s :execute " grep -srnw --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.svn --binary-files=without-match --exclude-dir=.git --exclude-dir=.repo . -e " . expand("<cword>") . " " <bar> cwindow<CR>
 "Set ctags looking path
 set tags=tags;/
-set tags+=~/ctags/boost.tags
+"set tags+=~/ctags/boost.tags
 
 set laststatus=2
 set statusline=%{GitBranch()}\ [%t:%l:%c\ --\ %p%%]\ %m%r
@@ -70,18 +76,18 @@ nmap <silent> [h :<C-U>execute v:count1 . "GitGutterPrevHunk"<CR>
 highlight clear SignColumn
 
 nmap ,a :call SwitchSourceHeader()<CR>
-
 function! SwitchSourceHeader()
   "update!
-  if (expand ("%:e") == "cpp")
+  if (expand ("%:e") == "cpp" || expand ("%:e") == "cc" )
     call Find(expand("%:t:r").".h")
   else
     call Find(expand("%:t:r").".cpp")
+    call Find(expand("%:t:r").".cc")
   endif
 endfunction
 
 function! Grep(name)
-  execute ":grep -isrn --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.git --exclude-dir=.repo --binary-files=without-match . -e ".a:name
+  execute ":grep -isrn --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.git --exclude-dir=.svn --exclude-dir=.repo --binary-files=without-match . -e ".a:name
   execute ":copen"
 endfunction
 command! -nargs=1 Grep :call Grep("<args>")
@@ -91,7 +97,7 @@ function! Find(name)
   let l:list=system("find . -iname '".a:name."' | perl -ne 'print \"$.\\t$_\"'")
   let l:num=strlen(substitute(l:list, "[^\n]", "", "g"))
   if l:num < 1
-    echo "'".a:name."' not found"
+    "echo "'".a:name."' not found"
     return
   endif
   if l:num != 1
@@ -117,3 +123,52 @@ function! Find(name)
 endfunction
 command! -nargs=1 Find :call Find("<args>")
 
+" vim-go settings
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+let g:go_fmt_command = "goimports"
+let g:neocomplete#enable_at_startup = 1
+" let g:go_fmt_autosave = 0
+
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
+            \ <SID>check_back_space() ? "\<TAB>" :
+            \ neocomplete#start_manual_complete()
+function! s:check_back_space() "{{{
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction"}}}
+
+" vundle setting
+set nocompatible
+filetype off
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle
+" required! 
+Plugin 'VundleVim/Vundle.vim'
+
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'L9'
+Plugin 'FuzzyFinder'
+Plugin 'git@github.com:motemen/git-vim.git'
+Plugin 'git@github.com:jisaacks/GitGutter.git'
+Plugin 'Mark'
+" Plugin 'git@github.com:Valloric/YouCompleteMe.git'
+Plugin 'scrooloose/syntastic'
+Plugin 'git@github.com:ton/vim-bufsurf.git'
+Plugin 'Shougo/neocomplete'
+Plugin 'Shougo/neosnippet'
+Plugin 'Shougo/neosnippet-snippets'
+Plugin 'git@github.com:keith/swift.vim.git'
+Plugin 'git@github.com:fatih/vim-go.git'
+Plugin 'git@github.com:majutsushi/tagbar.git'
+
+" All of your Plugins must be added before the following line
+call vundle#end()           " required
+filetype plugin indent on   " required!
