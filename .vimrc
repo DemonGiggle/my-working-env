@@ -1,21 +1,33 @@
 filetype plugin indent on
 au BufNewFile,BufRead *.cpp set syntax=cpp11
 set smartindent
-set shiftwidth=4
-set tabstop=4
-set expandtab ts=4 sw=4 ai
+set shiftwidth=2
+set tabstop=2
+set expandtab ts=2 sw=2 ai
 set hlsearch
 set backspace=indent,eol,start
+set number
 syntax on
-nmap ,f :FufCoverageFile<CR>
-nmap ,b :FufBuffer<CR>
-nmap ,,f :FufFileWithCurrentBufferDir<CR>
-nmap ,l :FufLine<CR>
+
+highlight Folded ctermbg=0 ctermfg=230
+
+" ----- Fuzzy Finder ----
+" nmap ,f :FufCoverageFile<CR>
+" nmap ,b :FufBuffer<CR>
+" nmap ,,f :FufFileWithCurrentBufferDir<CR>
+" nmap ,l :FufLine<CR>
 "nmap ,t :FufTaggedFile<CR>
-nmap ,d :GoDef<CR>
-nmap ,e :GoDoc<CR>
+
+" ------ Unite ---------
+nmap ,f :Unite -start-insert directory file_rec<CR> <Plug>(unite_redraw)
+nmap ,b :Unite -start-insert buffer<CR>
+
+" ------ Vim go --------
+" nmap ,d :GoDef<CR>
+" nmap ,e :GoDoc<CR>
+
 map sa :exec "/\\(".getreg('/')."\\)\\\\|".expand("<cword>")<CR>
-map ,c :Tlist<CR>
+" map ,c :Tlist<CR>
 nmap ,t :TagbarToggle<CR>
 
 "Buffer surf back and force
@@ -35,7 +47,7 @@ cabbrev find <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'Find' : 'find')<CR>
 "cabbrev gitpush <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitPush' : 'gitpush')<CR>
 "cabbrev gitblame <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'GitBlame' : 'gitblame')<CR>
 
-map ,s :execute " grep -srnw --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.svn --binary-files=without-match --exclude-dir=.git --exclude-dir=.repo . -e " . expand("<cword>") . " " <bar> cwindow<CR>
+"map ,s :execute " grep -srnw --exclude=tags --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.svn --binary-files=without-match --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.repo . -e " . expand("<cword>") . " " <bar>cwindow<CR>
 "Set ctags looking path
 set tags=tags;/
 "set tags+=~/ctags/boost.tags
@@ -48,6 +60,15 @@ set undodir=~/.vim/undodir
 set undofile
 set undolevels=1000 "maximum number of changes tha can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+
+" --- EasyMotion ---
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+" Jump to anywhere you want with minimal keystrokes, with just one key
+" binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+
+autocmd BufWritePre * %s/\s\+$//e
 
 " --- OmniCppComplete ---
 " -- required --
@@ -87,7 +108,7 @@ function! SwitchSourceHeader()
 endfunction
 
 function! Grep(name)
-  execute ":grep -isrn --exclude=tags --exclude=*.html --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.git --exclude-dir=.svn --exclude-dir=.repo --binary-files=without-match . -e ".a:name
+  execute ":grep -isrn --exclude=tags --exclude-dir=framework_addon --exclude-dir=network_addon --exclude-dir=runtime_addon --exclude-dir=build --exclude-dir=bin --exclude-dir=.git --exclude-dir=.svn --exclude-dir=.repo --binary-files=without-match . -e ".a:name
   execute ":copen"
 endfunction
 command! -nargs=1 Grep :call Grep("<args>")
@@ -124,22 +145,22 @@ endfunction
 command! -nargs=1 Find :call Find("<args>")
 
 " vim-go settings
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-let g:go_fmt_command = "goimports"
-let g:neocomplete#enable_at_startup = 1
+" let g:go_highlight_functions = 1
+" let g:go_highlight_methods = 1
+" let g:go_highlight_structs = 1
+" let g:go_highlight_operators = 1
+" let g:go_highlight_build_constraints = 1
+" let g:go_fmt_command = "goimports"
+" let g:neocomplete#enable_at_startup = 1
 " let g:go_fmt_autosave = 0
 
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
-            \ neocomplete#start_manual_complete()
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ neocomplete#start_manual_complete()
 function! s:check_back_space() "{{{
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
 endfunction"}}}
 
 " vundle setting
@@ -150,12 +171,12 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle
-" required! 
+" required!
 Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'Lokaltog/vim-easymotion'
+Plugin 'easymotion/vim-easymotion'
 Plugin 'L9'
-Plugin 'FuzzyFinder'
+" Plugin 'FuzzyFinder'
 Plugin 'git@github.com:motemen/git-vim.git'
 Plugin 'git@github.com:jisaacks/GitGutter.git'
 Plugin 'Mark'
@@ -168,7 +189,88 @@ Plugin 'Shougo/neosnippet-snippets'
 Plugin 'git@github.com:keith/swift.vim.git'
 Plugin 'git@github.com:fatih/vim-go.git'
 Plugin 'git@github.com:majutsushi/tagbar.git'
+Plugin 'jelera/vim-javascript-syntax'
+Plugin 'git@github.com:digitaltoad/vim-jade.git'
+Plugin 'git@github.com:othree/javascript-libraries-syntax.vim.git'
+Plugin 'vim-ruby/vim-ruby'
+Plugin 'git@github.com:tpope/vim-rails.git'
+Plugin 'slim-template/vim-slim.git'
+Plugin 'padde/jump.vim'
+
+" -- start -- silver search related plugin
+Plugin 'git@github.com:rking/ag.vim.git'
+Plugin 'git@github.com:Chun-Yang/vim-action-ag.git'
+" -- end -- silver search related plugin
+
+" The local vim conifguration
+Plugin 'git://github.com/thinca/vim-localrc'
+
+" Unite Vim
+Plugin 'git://github.com/Shougo/unite.vim'
+Plugin 'git://github.com/ujihisa/unite-colorscheme'
+Plugin 'git://github.com/basyura/unite-rails'
+
+" Elixir
+Plugin 'elixir-lang/vim-elixir'
+Plugin 'slashmili/alchemist.vim'
+
+" Git wrapper
+Plugin 'git://github.com/tpope/vim-fugitive'
+
+" solidity
+Plugin 'tomlion/vim-solidity'
+
+" terraform
+Plugin 'git://github.com/hashivim/vim-terraform.git'
+
+" vuejs
+Plugin 'posva/vim-vue'
+
+" indent handler
+Plugin 'Yggdroot/indentLine'
+
+" rust
+Plugin 'rust-lang/rust.vim'
+Plugin 'racer-rust/vim-racer'
 
 " All of your Plugins must be added before the following line
 call vundle#end()           " required
 filetype plugin indent on   " required!
+
+" == Unite initialization
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+" == end of Unite initializatoin
+
+let g:syntastic_enable_elixir_checker = 1
+let g:syntastic_enable_rubyr_checker = 1
+let g:syntastic_elixir_checkers = ['elixir', 'ruby']
+let g:syntastic_c_cppcheck_args = ["-std=c++17", "-Wc++11-extensions"]
+
+" change the vimdiff color
+highlight DiffAdd    cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Red
+
+" setting of indentLine plugin
+let g:indentLine_conceallevel = 2
+let g:indentLine_char = '┆'
+let g:indentLine_enabled = 0  " to enabled it, use :IndentLinesToggle
+
+" setting of rustfmt
+let g:rustfmt_autosave = 1
+
+" setting of racer
+set hidden
+let g:racer_cmd = "/Users/giggle/.cargo/bin/racer"
+let g:racer_experimental_completer = 1
+
+augroup Racer
+    autocmd!
+    autocmd FileType rust nmap <buffer> gd         <Plug>(rust-def)
+    autocmd FileType rust nmap <buffer> gs         <Plug>(rust-def-split)
+    autocmd FileType rust nmap <buffer> gx         <Plug>(rust-def-vertical)
+    autocmd FileType rust nmap <buffer> <leader>gt <Plug>(rust-def-tab)
+    autocmd FileType rust nmap <buffer> <leader>gd <Plug>(rust-doc)
+augroup END
+" end of racer setting
